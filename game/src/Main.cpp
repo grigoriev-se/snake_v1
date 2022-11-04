@@ -1,72 +1,123 @@
 #include <iostream>
 #include <stdlib.h>
+#include <conio.h>
+#include <string>
 
-class snake {
+using namespace std;
+
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+
+int ROW = 10;
+int COL = 10;
+
+	class snake {
 public:
 	int x, y;
 
 	void Move(int xdir, int ydir) {
 		x += xdir;
-		y += ydir;
+		y -= ydir; // - since calculated from upper left corner.
 	}
 };
 
 void generate_board(snake snake) {
 	// Generate board
-	for (int rows = 0; rows < 19; ++rows) {
-		for (int cols = 0; cols < 19; ++cols) {
-			if (rows == 0 || rows == 18) {
-				std::cout << "#";
+
+
+	for (int rows = 0; rows < (ROW); ++rows) {
+		for (int cols = 0; cols < (COL); ++cols) {
+			if (rows == 0 || rows == (ROW-1)) {
+				cout << "#";
 			}
-			else if (cols == 0 || cols == 18) {
-				std::cout << "#";
+			else if (cols == 0 || cols == (COL-1)) {
+				cout << "#";
 			}
 			// Put either " " or snake
-			else if (snake.x == rows && snake.y == cols){
-				std::cout << "O";
+			else if (snake.x == cols && snake.y == rows){
+				cout << "O";
 			}
 			else
 			{
-				std::cout << " ";
+				cout << " ";
 			}
 		}
-		std::cout << "\n";
+		cout << "\n";
 	}
+	cout << "\nPress UP/DOWN/LEFT/RIGHT keys: ";
+
 }
 
 bool check_boundaries(snake snake) {
-	if (snake.x != 0 && snake.x != 19 && snake.y != 0 && snake.y != 19)
+	if (snake.x == 0 || snake.x == (COL-1) || snake.y == 0 || snake.y == (ROW-1))
 	{
-		return true;
+		return false;
 	}
 	else
-		return false;
+		return true;
 }
 
 // Will not be necessary in future
 bool run_game(int a) {
-	if (a < 10) return true;
+	if (a < 50) return true;
 	else return false;
 }
 
 int main() {
-	int a = 0;
-	int score = 0;
-	int xdir = 1, ydir = 0;
+	int a = 0, score = 0;
+	int xdir, ydir;
+
+	char key;
+	int value;
+
 	snake snake;
-	snake.x = 10;
-	snake.y = 10;
+	srand((unsigned)time(NULL));
+	snake.x = 1+(rand() % (COL-2));
+	snake.y = 1+(rand() % (ROW-2));
+
+	cout << snake.x << "\n";
+	cout << snake.y << "\n";
 
 	while (run_game(a) == true) {
 		generate_board(snake);
+		
+		key = _getch();
+		value = key;
+
+		// Run around the board.
+		switch (_getch()) {
+		case KEY_UP:
+			xdir = 0;
+			ydir = 1;
+			break;
+		case KEY_DOWN:
+			xdir = 0;
+			ydir = -1;
+			break;
+		case KEY_LEFT:
+			xdir = -1;
+			ydir = 0;
+			break;
+		case KEY_RIGHT:
+			xdir = 1;
+			ydir = 0;
+			break;
+		}
+		
 		snake.Move(xdir, ydir);
-		check_boundaries(snake);
+
+		if (!check_boundaries(snake)) {
+			break;
+		}
+
 		system("CLS");
 		a += 1;
 		score += 1;
 	}
 	
-	std::cout << "You died, your score: " << score << "\n";
+	cout << "You died, your score: " << score << "\n";
 
 	return 0;
 }

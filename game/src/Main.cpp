@@ -13,31 +13,42 @@ using namespace std;
 int ROW = 10;
 int COL = 10;
 
-	class snake {
+class snake {
 public:
 	int x, y;
 
-	void Move(int xdir, int ydir) {
+	void move(int xdir, int ydir) {
 		x += xdir;
 		y -= ydir; // - since calculated from upper left corner.
 	}
 };
 
-void generate_board(snake snake) {
+class apple {
+public:
+	int x, y;
+
+	void generate_pos() {
+		x = 1 + (rand() % (COL - 2));
+		y = 1 + (rand() % (ROW - 2));
+	}
+};
+
+void generate_board(snake snake, apple apple) {
 	// Generate board
-
-
 	for (int rows = 0; rows < (ROW); ++rows) {
 		for (int cols = 0; cols < (COL); ++cols) {
-			if (rows == 0 || rows == (ROW-1)) {
+			if (rows == 0 || rows == (ROW - 1)) {
 				cout << "#";
 			}
-			else if (cols == 0 || cols == (COL-1)) {
+			else if (cols == 0 || cols == (COL - 1)) {
 				cout << "#";
 			}
 			// Put either " " or snake
-			else if (snake.x == cols && snake.y == rows){
+			else if (snake.x == cols && snake.y == rows) {
 				cout << "O";
+			}
+			else if (apple.x == cols && apple.y == rows) {
+				cout << "d";
 			}
 			else
 			{
@@ -50,13 +61,20 @@ void generate_board(snake snake) {
 
 }
 
-bool check_boundaries(snake snake) {
-	if (snake.x == 0 || snake.x == (COL-1) || snake.y == 0 || snake.y == (ROW-1))
-	{
-		return false;
+snake check_boundaries(snake snake) {
+	if (snake.x == 0) {
+		snake.x = (COL - 2);
 	}
-	else
-		return true;
+	else if (snake.x == (COL - 1)) {
+		snake.x = 1;
+	}
+	else if (snake.y == 0) {
+		snake.y = (ROW - 2);
+	}
+	else if (snake.y == (ROW - 1)) {
+		snake.y = 1;
+	}
+	return snake;
 }
 
 // Will not be necessary in future
@@ -74,15 +92,23 @@ int main() {
 
 	snake snake;
 	srand((unsigned)time(NULL));
-	snake.x = 1+(rand() % (COL-2));
-	snake.y = 1+(rand() % (ROW-2));
+	snake.x = 1 + (rand() % (COL - 2));
+	snake.y = 1 + (rand() % (ROW - 2));
 
-	cout << snake.x << "\n";
-	cout << snake.y << "\n";
+	
+	apple apple;
+	apple.generate_pos();
 
 	while (run_game(a) == true) {
-		generate_board(snake);
-		
+		if (apple.x == snake.x && apple.y == snake.y) {
+			apple.generate_pos();
+			score += 1;
+		}
+		cout << "x: " << snake.x << "\n";
+		cout << "y: " << snake.y << "\n";
+		cout << "Your score: " << score << "\n";
+		generate_board(snake, apple);
+
 		key = _getch();
 		value = key;
 
@@ -105,18 +131,14 @@ int main() {
 			ydir = 0;
 			break;
 		}
-		
-		snake.Move(xdir, ydir);
 
-		if (!check_boundaries(snake)) {
-			break;
-		}
+		snake.move(xdir, ydir);
+		snake = check_boundaries(snake);
 
 		system("CLS");
 		a += 1;
-		score += 1;
 	}
-	
+
 	cout << "You died, your score: " << score << "\n";
 
 	return 0;
